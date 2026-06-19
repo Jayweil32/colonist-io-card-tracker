@@ -171,6 +171,9 @@ export function applyEvent(state, ev) {
     case "build": // {type, player, item}
       spend(state, ev.player, COSTS[ev.item]);
       break;
+    case "place_free": // {type, player, item} — free opening placement, no cost
+      // Board-state only; no resources change. Intentionally a no-op here.
+      break;
     case "bank_trade": // {type, player, give:{res:n}, receive:{res:n}}
       for (const r of Object.keys(ev.give)) loseAndConstrain(state, ev.player, r, ev.give[r]);
       for (const r of Object.keys(ev.receive)) gain(state, ev.player, r, ev.receive[r]);
@@ -195,6 +198,21 @@ export function applyEvent(state, ev) {
       let total = Object.values(ev.takenFrom).reduce((a, b) => a + b, 0);
       gain(state, ev.player, ev.resource, total);
       break;
+    case "monopoly_haul": { // {type, player, resource, count}
+      // colonist reports only the total taken, not per-victim amounts. A
+      // monopoly takes ALL of `resource` from every other player, so we zero out
+      // each opponent's holding of it (both bounds) and give the monopolizer the
+      // reported count. Any unresolved steals of that resource are also moot now.
+      for (const name of Object.keys(state.players)) {
+        if (name === ev.player) continue;
+        state.players[name].min[ev.resource] = 0;
+        state.players[name].max[ev.resource] = 0;
+      }
+      gain(state, ev.player, ev.resource, ev.count);
+      // Drop any unresolved steals involving this resource (now meaningless).
+      resolveSteals(state);
+      break;
+    }
     default:
       throw new Error(`unknown event type: ${ev.type}`);
   }
