@@ -100,6 +100,11 @@ roads may currently be charged as if paid. See DEVELOPMENT.md for how to add it.
 - Check colonist.io's Terms of Service regarding userscripts before using this in
   ranked play. This is provided for learning and casual use.
 
+## Authors
+
+Sebastian Tovar (s3bxs@outlook.com)
+Jay Weil (weiljt@mail.uc.edu)
+
 ## License
 
 Proprietary — all rights reserved. See [LICENSE](./LICENSE). This code is shared for viewing only; it may not be reused, redistributed, or sold without written permission.
